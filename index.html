@@ -332,8 +332,8 @@ public class client {
 }` }]
 },
 {
-  id: "window", title: "6. Sliding Window (Frames and ACKs)", tag: "TCP",
-  desc: "The sender tells the receiver how many frames to expect, then sends each frame and waits for its ACK.",
+  id: "window", title: "6. Stop-and-Wait (Frames and ACKs)", tag: "TCP",
+  desc: "Window size 1. The sender tells the receiver how many frames to expect, then sends one frame at a time and waits for its ACK before the next.",
   run: "Start Receiver first, then Sender. Enter the frame count, then one word per frame.",
   files: [
 { name: "Sender.java", code: String.raw`import java.io.*;
@@ -537,6 +537,63 @@ public class client {
         System.out.println("IP address: " + ip);
         s.close();
         c.close();
+    }
+}` }]
+},
+{
+  id: "sliding", title: "10. Sliding Window", tag: "TCP",
+  desc: "The sender keeps up to w unacknowledged frames in flight and slides the window forward as each ACK arrives. Simplified: no frame loss or timeout.",
+  run: "Start SWReceiver first, then SWSender. Try 5 frames with window size 3.",
+  files: [
+{ name: "SWSender.java", code: String.raw`import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class SWSender {
+    public static void main(String args[]) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        Socket s = new Socket("localhost", 8000);
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        DataInputStream in = new DataInputStream(s.getInputStream());
+        System.out.print("Enter total frames: ");
+        int n = sc.nextInt();
+        System.out.print("Enter window size: ");
+        int w = sc.nextInt();
+        out.writeInt(n);
+        int base = 0;   // oldest unacknowledged frame
+        int next = 0;   // next frame to send
+        while (base < n) {
+            while (next < n && next < base + w) {   // window has space
+                out.writeInt(next);
+                System.out.println("Frame " + next + " sent");
+                next++;
+            }
+            int ack = in.readInt();                  // wait for an ACK
+            System.out.println("ACK " + ack + " received");
+            base = ack + 1;                          // slide the window
+        }
+        s.close();
+        sc.close();
+    }
+}` },
+{ name: "SWReceiver.java", code: String.raw`import java.io.*;
+import java.net.*;
+
+public class SWReceiver {
+    public static void main(String args[]) throws Exception {
+        ServerSocket ss = new ServerSocket(8000);
+        Socket s = ss.accept();
+        DataInputStream in = new DataInputStream(s.getInputStream());
+        DataOutputStream out = new DataOutputStream(s.getOutputStream());
+        int n = in.readInt();
+        for (int i = 0; i < n; i++) {
+            int f = in.readInt();
+            System.out.println("Frame " + f + " received");
+            out.writeInt(f);
+            System.out.println("ACK " + f + " sent");
+        }
+        s.close();
+        ss.close();
     }
 }` }]
 }

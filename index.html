@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CN Lab: Java Network Programs</title>
+<style>
+  :root {
+    --bg: #f7f8fa; --card: #ffffff; --text: #1c2330; --muted: #5b6577;
+    --border: #dfe3ea; --accent: #2563eb; --accent-text: #ffffff;
+    --code-bg: #0f172a; --code-text: #e2e8f0; --code-bar: #1e293b;
+    --kw: #c084fc; --str: #86efac; --com: #64748b; --num: #fdba74; --typ: #7dd3fc;
+    --ok: #16a34a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b1020; --card: #131a2e; --text: #e6eaf2; --muted: #93a0b8;
+      --border: #26304a; --accent: #60a5fa; --accent-text: #0b1020;
+      --code-bg: #070b16; --code-bar: #182036;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1020; --card: #131a2e; --text: #e6eaf2; --muted: #93a0b8;
+    --border: #26304a; --accent: #60a5fa; --accent-text: #0b1020;
+    --code-bg: #070b16; --code-bar: #182036;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.55;
+  }
+  header { padding: 28px 20px 8px; max-width: 980px; margin: 0 auto; }
+  header h1 { margin: 0 0 6px; font-size: 1.6rem; }
+  header p { margin: 0; color: var(--muted); }
+  nav {
+    position: sticky; top: 0; z-index: 10; background: var(--bg);
+    border-bottom: 1px solid var(--border); padding: 10px 20px;
+  }
+  .navin { max-width: 980px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; align-items: center; }
+  nav a {
+    white-space: nowrap; text-decoration: none; color: var(--text); font-size: .85rem;
+    border: 1px solid var(--border); background: var(--card); padding: 6px 12px; border-radius: 999px;
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+  #theme { margin-left: auto; cursor: pointer; border: 1px solid var(--border); background: var(--card);
+    color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .85rem; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px 20px 60px; }
+  .tip {
+    background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+    border-radius: 8px; padding: 12px 16px; margin: 12px 0 24px; font-size: .92rem;
+  }
+  section.prog {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin: 0 0 24px;
+  }
+  section.prog h2 { margin: 0 0 4px; font-size: 1.2rem; }
+  .tag { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    background: var(--accent); color: var(--accent-text); margin-left: 8px; vertical-align: middle; }
+  .desc { color: var(--muted); margin: 0 0 10px; font-size: .93rem; }
+  .run { font-size: .85rem; color: var(--muted); margin: 0 0 14px; }
+  .run code { background: var(--code-bg); color: var(--code-text); padding: 2px 6px; border-radius: 4px; font-size: .8rem; }
+  .toolbar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+  .file { border-radius: 8px; overflow: hidden; margin: 0 0 14px; border: 1px solid var(--border); }
+  .bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--code-bar); color: #cbd5e1; padding: 6px 10px 6px 14px; font-size: .82rem;
+    font-family: ui-monospace, Consolas, monospace;
+  }
+  button.copy {
+    cursor: pointer; border: 0; border-radius: 6px; padding: 6px 12px; font-size: .8rem; font-weight: 600;
+    background: var(--accent); color: var(--accent-text);
+  }
+  button.copy.all { padding: 7px 14px; }
+  button.copy.done { background: var(--ok); color: #fff; }
+  pre { margin: 0; background: var(--code-bg); color: var(--code-text); padding: 14px; overflow-x: auto;
+    font: .82rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 4; }
+  .k { color: var(--kw); } .s { color: var(--str); } .c { color: var(--com); font-style: italic; }
+  .n { color: var(--num); } .t { color: var(--typ); }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Computer Networks Lab: Java Programs</h1>
+  <p>Every program from the lab, ready to copy. Click <b>Copy</b> on any file, or <b>Copy both</b> for a pair.</p>
+</header>
+<nav><div class="navin" id="nav"><button id="theme" type="button">Theme</button></div></nav>
+<main>
+  <div class="tip"><b>Before you run any pair:</b> save each file with the exact class name (<code>server.java</code>, <code>client.java</code>), start the <b>server first</b>, then the client in a second terminal. Compile with <code>javac X.java</code> and run with <code>java X</code>.</div>
+  <div id="root"></div>
+</main>
+<footer>Practice, then retype from memory before the exam.</footer>
+
+<script>
+const PROGRAMS = [
+{
+  id: "echo", title: "1. TCP Echo", tag: "TCP",
+  desc: "Client sends one message; the server prints it and sends it back.",
+  run: "Run server first, then client. Type a message in the client terminal.",
+  files: [
+{ name: "server.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        String str = dis.readUTF();
+        System.out.println("msg from client:" + str);
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        dos.writeUTF(str);
+        s.close();
+        ss.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        String str;
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        Scanner c = new Scanner(System.in);
+        str = c.nextLine();
+        dos.writeUTF(str);
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        str = dis.readUTF();
+        System.out.println("Echoed msg:" + str);
+        s.close();
+    }
+}` }]
+},
+{
+  id: "chat", title: "2. Two-Way Chat", tag: "TCP",
+  desc: "Client and server take turns sending messages until either types \"end\".",
+  run: "Client writes first, server reads first. Type end to stop.",
+  files: [
+{ name: "server.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        Scanner c = new Scanner(System.in);
+        String str1 = "", str2 = "";
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        while (!str1.equals("end")) {
+            str1 = dis.readUTF();
+            System.out.println("Client:" + str1);
+            if (str1.equals("end"))
+                break;
+            System.out.println("Enter msg to client");
+            str2 = c.nextLine();
+            dos.writeUTF(str2);
+        }
+        s.close();
+        ss.close();
+        c.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        Scanner c = new Scanner(System.in);
+        String str1 = "", str2 = "";
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        while (!str1.equals("end")) {
+            System.out.println("Enter msg to Server");
+            str1 = c.nextLine();
+            dos.writeUTF(str1);
+            if (str1.equals("end"))
+                break;
+            str2 = dis.readUTF();
+            System.out.println("Server:" + str2);
+        }
+        s.close();
+        c.close();
+    }
+}` }]
+},
+{
+  id: "date", title: "3. Date and Time Server", tag: "TCP",
+  desc: "The server sends the current date and time to any client that connects.",
+  run: "Run server, then client. The client prints the date and exits.",
+  files: [
+{ name: "server.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        Date d = new Date();
+        String str = new String("Current Data and Time: " + d);
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        dos.writeUTF(str);
+        s.close();
+        ss.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        String str = dis.readUTF();
+        System.out.println(str);
+        s.close();
+    }
+}` }]
+},
+{
+  id: "file", title: "4. File Transfer", tag: "TCP",
+  desc: "The server sends ID.html to the client, which saves it as Recived_file.html.",
+  run: "Put an ID.html file in the server's folder before running the server.",
+  files: [
+{ name: "server.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        File file = new File("ID.html");
+        OutputStream os = s.getOutputStream();
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+        byte[] contents = new byte[10000];
+        int bytesRead;
+        while ((bytesRead = bis.read(contents)) != -1) {
+            os.write(contents, 0, bytesRead);
+        }
+        os.flush();
+        os.close();
+        bis.close();
+        s.close();
+        ss.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        String file = "Recived_file.html";
+        InputStream is = s.getInputStream();
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        byte[] contents = new byte[10000];
+        int bytesRead;
+        while ((bytesRead = is.read(contents)) != -1) {
+            bos.write(contents, 0, bytesRead);
+        }
+        bos.flush();
+        bos.close();
+        is.close();
+        s.close();
+    }
+}` }]
+},
+{
+  id: "udp", title: "5. UDP Domain / IP Lookup (DNS)", tag: "UDP",
+  desc: "The client sends a domain or IP; the server replies with the matching IP or domain, or \"not found\".",
+  run: "Try www.svce.ac.in or 172.16.2.79 as input.",
+  files: [
+{ name: "server.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        DatagramSocket ds = new DatagramSocket(1234);
+        String[] domain = { "www.ram.com", "www.cs-b.com", "www.svce.ac.in" };
+        String[] ip = { "192.168.24.100", "165.165.79.1", "172.16.2.79" };
+        byte[] data = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(data, data.length);
+        ds.receive(dp);
+        String msg = new String(dp.getData(), 0, dp.getLength());
+        String result = "not found";
+        for (int i = 0; i < domain.length; i++) {
+            if (msg.equals(domain[i])) {
+                result = ip[i];
+            }
+            if (msg.equals(ip[i])) {
+                result = domain[i];
+            }
+        }
+        dp = new DatagramPacket(result.getBytes(), result.length(),
+                dp.getAddress(), dp.getPort());
+        ds.send(dp);
+        ds.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        DatagramSocket ds = new DatagramSocket();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter the IP/Domain:");
+        String msg = br.readLine();
+        DatagramPacket dp = new DatagramPacket(msg.getBytes(), msg.length(),
+                InetAddress.getLocalHost(), 1234);
+        ds.send(dp);
+        byte[] data = new byte[1024];
+        dp = new DatagramPacket(data, data.length);
+        ds.receive(dp);
+        String result = new String(dp.getData(), 0, dp.getLength());
+        System.out.println(result);
+        ds.close();
+    }
+}` }]
+},
+{
+  id: "window", title: "6. Sliding Window (Frames and ACKs)", tag: "TCP",
+  desc: "The sender tells the receiver how many frames to expect, then sends each frame and waits for its ACK.",
+  run: "Start Receiver first, then Sender. Enter the frame count, then one word per frame.",
+  files: [
+{ name: "Sender.java", code: String.raw`import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class Sender {
+    public static void main(String args[]) throws Exception {
+
+        int p = 9000, q = 8000;
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter number of frames: ");
+        int number = scanner.nextInt();
+        Socket s2 = new Socket("localhost", q);
+        DataOutputStream out1 = new DataOutputStream(s2.getOutputStream());
+        out1.write(number);
+        s2.close();
+
+        // Send each frame
+        for (int i = 0; i < number; i++) {
+            System.out.print("Enter message: ");
+            String msg = scanner.next();
+            Socket s1 = new Socket("localhost", p + i);
+            DataOutputStream out = new DataOutputStream(s1.getOutputStream());
+            DataInputStream in = new DataInputStream(s1.getInputStream());
+            out.writeUTF(msg);
+            System.out.println("Frame " + i + " Sent");
+            int ack = in.read();
+            System.out.println("ACK " + ack + " Received");
+            s1.close();
+        }
+
+        scanner.close();
+    }
+}` },
+{ name: "Receiver.java", code: String.raw`import java.io.*;
+import java.net.*;
+
+public class Receiver {
+    public static void main(String args[]) throws Exception {
+        // Receive number of frames
+        ServerSocket ss2 = new ServerSocket(8000);
+        Socket s2 = ss2.accept();
+        DataInputStream in1 = new DataInputStream(s2.getInputStream());
+        int number = in1.read();
+        s2.close();
+        ss2.close();
+
+        // Receive each frame
+        for (int i = 0; i < number; i++) {
+            ServerSocket ss1 = new ServerSocket(9000 + i);
+            Socket s1 = ss1.accept();
+            DataInputStream in = new DataInputStream(s1.getInputStream());
+            DataOutputStream out = new DataOutputStream(s1.getOutputStream());
+            String msg = in.readUTF();
+            System.out.println("Frame " + i + " Received: " + msg);
+            out.write(i);
+            System.out.println("ACK " + i + " Sent");
+            s1.close();
+            ss1.close();
+        }
+    }
+}` }]
+},
+{
+  id: "subnet", title: "7. Subnetting (Network Address and Host ID)", tag: "No sockets",
+  desc: "Finds the class-based subnet mask, network address and host ID for an IP. Runs alone, no server needed.",
+  run: "Try 192.168.1.10 (Class C) or 172.16.5.9 (Class B).",
+  files: [
+{ name: "subnetting.java", code: String.raw`import java.io.*;
+import java.net.*;
+
+public class subnetting {
+    public static void main(String[] args) throws IOException {
+        System.out.print("Enter IP: ");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String ip = br.readLine();
+        String[] ipAddrParts = ip.split("\\.");
+        String checkclass = ipAddrParts[0];
+        int cc = Integer.parseInt(checkclass);
+        String mask = null;
+        if (cc > 0 && cc < 224) {
+            if (cc < 128)
+                mask = "255.0.0.0";
+
+            if (cc > 127 && cc < 192)
+                mask = "255.255.0.0";
+
+            if (cc > 191)
+                mask = "255.255.255.0";
+        }
+        System.out.println("\nMASK : " + mask);
+        String networkAddr = "";
+        String hostid = "";
+        String[] maskParts = mask.split("\\.");
+        for (int i = 0; i < 4; i++) {
+            int x = Integer.parseInt(ipAddrParts[i]);
+            int y = Integer.parseInt(maskParts[i]);
+            int z = x & y;
+            networkAddr += z + ".";
+
+            z = x - z;
+            hostid += z + ".";
+        }
+
+        System.out.println("NETWORK ADDRESS : " + networkAddr);
+        System.out.println("HOST ID : " + hostid);
+    }
+}` }]
+},
+{
+  id: "arp", title: "8. ARP (IP to MAC)", tag: "TCP",
+  desc: "Simulates ARP. The client sends an IP address and the server looks up the matching MAC address in its table.",
+  run: "Try 192.168.1.2. An IP not in the table returns \"not found\".",
+  files: [
+{ name: "server.java", code: String.raw`import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        String[] ip = { "192.168.1.1", "192.168.1.2", "192.168.1.3" };
+        String[] mac = { "AA:BB:CC:DD:EE:01", "AA:BB:CC:DD:EE:02", "AA:BB:CC:DD:EE:03" };
+        String query = dis.readUTF();
+        String result = "not found";
+        for (int i = 0; i < ip.length; i++) {
+            if (query.equals(ip[i])) {
+                result = mac[i];
+            }
+        }
+        dos.writeUTF(result);
+        s.close();
+        ss.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        Scanner c = new Scanner(System.in);
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        System.out.print("Enter IP address: ");
+        String ip = c.nextLine();
+        dos.writeUTF(ip);
+        String mac = dis.readUTF();
+        System.out.println("MAC address: " + mac);
+        s.close();
+        c.close();
+    }
+}` }]
+},
+{
+  id: "rarp", title: "9. RARP (MAC to IP)", tag: "TCP",
+  desc: "Simulates RARP, the reverse of ARP. The client sends a MAC address and the server returns the matching IP address.",
+  run: "Try AA:BB:CC:DD:EE:02. The MAC match ignores upper/lower case.",
+  files: [
+{ name: "server.java", code: String.raw`import java.io.*;
+import java.net.*;
+
+public class server {
+    public static void main(String args[]) throws IOException {
+        ServerSocket ss = new ServerSocket(1234);
+        Socket s = ss.accept();
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        String[] ip = { "192.168.1.1", "192.168.1.2", "192.168.1.3" };
+        String[] mac = { "AA:BB:CC:DD:EE:01", "AA:BB:CC:DD:EE:02", "AA:BB:CC:DD:EE:03" };
+        String query = dis.readUTF();
+        String result = "not found";
+        for (int i = 0; i < mac.length; i++) {
+            if (query.equalsIgnoreCase(mac[i])) {
+                result = ip[i];
+            }
+        }
+        dos.writeUTF(result);
+        s.close();
+        ss.close();
+    }
+}` },
+{ name: "client.java", code: String.raw`import java.util.*;
+import java.io.*;
+import java.net.*;
+
+public class client {
+    public static void main(String args[]) throws IOException {
+        Socket s = new Socket("localhost", 1234);
+        Scanner c = new Scanner(System.in);
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        System.out.print("Enter MAC address: ");
+        String mac = c.nextLine();
+        dos.writeUTF(mac);
+        String ip = dis.readUTF();
+        System.out.println("IP address: " + ip);
+        s.close();
+        c.close();
+    }
+}` }]
+}
+];
+
+const KW = "abstract|boolean|break|byte|case|catch|class|else|extends|final|finally|for|if|implements|import|int|new|null|package|private|protected|public|return|static|super|this|throw|throws|try|void|while|char|double|float|long|short";
+const RE = new RegExp(
+  "(\\/\\/[^\\n]*)" +               // 1 comment
+  "|(\"(?:\\\\.|[^\"\\\\])*\")" +    // 2 string
+  "|\\b(" + KW + ")\\b" +            // 3 keyword
+  "|\\b(\\d+)\\b" +                  // 4 number
+  "|\\b([A-Z][A-Za-z0-9_]*)\\b",     // 5 type
+  "g"
+);
+function esc(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function highlight(code) {
+  let out = "", last = 0, m;
+  RE.lastIndex = 0;
+  while ((m = RE.exec(code)) !== null) {
+    out += esc(code.slice(last, m.index));
+    const cls = m[1] ? "c" : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "t";
+    out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
+    last = RE.lastIndex;
+  }
+  return out + esc(code.slice(last));
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e2) { return false; }
+  }
+}
+function flash(btn, label) {
+  const old = btn.dataset.label;
+  btn.textContent = label;
+  btn.classList.add("done");
+  setTimeout(function () { btn.textContent = old; btn.classList.remove("done"); }, 1500);
+}
+function makeBtn(text, cls, getText) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "copy " + cls;
+  b.textContent = text;
+  b.dataset.label = text;
+  b.addEventListener("click", async function () {
+    const ok = await copyText(getText());
+    flash(b, ok ? "Copied!" : "Press Ctrl+C");
+  });
+  return b;
+}
+
+const root = document.getElementById("root");
+const nav = document.getElementById("nav");
+const themeBtn = document.getElementById("theme");
+
+PROGRAMS.forEach(function (p) {
+  const a = document.createElement("a");
+  a.href = "#" + p.id;
+  a.textContent = p.title.split(".")[0] + ". " + p.title.split(". ")[1].split(" (")[0];
+  nav.insertBefore(a, themeBtn);
+
+  const sec = document.createElement("section");
+  sec.className = "prog";
+  sec.id = p.id;
+  sec.innerHTML = '<h2>' + esc(p.title) + '<span class="tag">' + esc(p.tag) + '</span></h2>' +
+    '<p class="desc">' + esc(p.desc) + '</p>' +
+    '<p class="run"><b>How to run:</b> ' + esc(p.run) + '</p>';
+
+  if (p.files.length > 1) {
+    const bar = document.createElement("div");
+    bar.className = "toolbar";
+    bar.appendChild(makeBtn("Copy both", "all", function () {
+      return p.files.map(function (f) { return "// " + f.name + "\n" + f.code; }).join("\n\n");
+    }));
+    sec.appendChild(bar);
+  }
+
+  p.files.forEach(function (f) {
+    const box = document.createElement("div");
+    box.className = "file";
+    const head = document.createElement("div");
+    head.className = "bar";
+    const nm = document.createElement("span");
+    nm.textContent = f.name;
+    head.appendChild(nm);
+    head.appendChild(makeBtn("Copy", "", function () { return f.code; }));
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.innerHTML = highlight(f.code);
+    pre.appendChild(code);
+    box.appendChild(head);
+    box.appendChild(pre);
+    sec.appendChild(box);
+  });
+  root.appendChild(sec);
+});
+
+themeBtn.addEventListener("click", function () {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+});
+</script>
+</body>
+</html>
